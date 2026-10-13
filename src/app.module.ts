@@ -7,6 +7,7 @@ import { PersistenciaModule } from './persistencia/persistencia.module';
 import { AvisosModule } from './consumidores/avisos/avisos.module';
 import { AuditoriaModule } from './consumidores/auditoria/auditoria.module';
 import { CorreosModule } from './consumidores/correos/correos.module';
+import { MensajesMuertosModule } from './consumidores/mensajes-muertos/mensajes-muertos.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CorreosModule } from './consumidores/correos/correos.module';
     AvisosModule,
     AuditoriaModule,
     CorreosModule,
+    MensajesMuertosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -6,3 +6,7 @@ export const PREFETCH = 1;
 // Reintento acotado para fallos transitorios: 3 intentos, 2 s entre ellos.
 export const REINTENTOS_MAX = 3;
 export const ESPERA_REINTENTO_MS = 2000;
+
+// Si Postgres no responde al registrar un mensaje muerto, se espera antes de devolverlo
+// a su DLQ para no girar a toda velocidad.
+export const ESPERA_DLQ_MS = 5000;

@@ -16,6 +16,7 @@ const persistencia_module_1 = require("./persistencia/persistencia.module");
 const avisos_module_1 = require("./consumidores/avisos/avisos.module");
 const auditoria_module_1 = require("./consumidores/auditoria/auditoria.module");
 const correos_module_1 = require("./consumidores/correos/correos.module");
+const mensajes_muertos_module_1 = require("./consumidores/mensajes-muertos/mensajes-muertos.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -28,6 +29,7 @@ exports.AppModule = AppModule = __decorate([
             avisos_module_1.AvisosModule,
             auditoria_module_1.AuditoriaModule,
             correos_module_1.CorreosModule,
+            mensajes_muertos_module_1.MensajesMuertosModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
