@@ -46,6 +46,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RabbitService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
+const declarar_topologia_1 = require("../mensajeria/declarar-topologia");
 const amqp = __importStar(require("amqplib"));
 let RabbitService = RabbitService_1 = class RabbitService {
     config;
@@ -59,6 +60,7 @@ let RabbitService = RabbitService_1 = class RabbitService {
         const url = this.config.getOrThrow('RABBITMQ_URL');
         this.connection = await amqp.connect(url);
         this.channel = await this.connection.createChannel();
+        await (0, declarar_topologia_1.declararTopologia)(this.channel);
         this.logger.log('Conectado a RabbitMQ');
     }
     getChannel() {
