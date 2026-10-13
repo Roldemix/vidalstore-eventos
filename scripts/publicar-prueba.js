@@ -18,7 +18,7 @@ async function main() {
   const ch = await conn.createChannel();
   await ch.assertExchange('vidalstore.eventos', 'topic', { durable: true });
 
-  const eventoId = randomUUID();
+  const eventoId = process.argv.find((a) => a.startsWith('--id='))?.slice(5) ?? randomUUID();
   const cuerpo = malo ? 'esto no es json' : JSON.stringify(PAYLOADS[key]());
   ch.publish('vidalstore.eventos', key, Buffer.from(cuerpo), {
     persistent: true,

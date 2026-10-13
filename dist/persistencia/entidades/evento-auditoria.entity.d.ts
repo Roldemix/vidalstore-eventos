@@ -3,7 +3,7 @@ export declare class EventoAuditoria {
     routingKey: string;
     eventoId: string;
     usuarioSub: string | null;
-    payload: unknown;
+    payload: Record<string, any>;
     emitidoEn: Date;
     recibidoEn: Date;
 }

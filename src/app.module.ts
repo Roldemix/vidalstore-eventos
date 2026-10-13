@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { RabbitModule } from './rabbit/rabbit.module';
 import { PersistenciaModule } from './persistencia/persistencia.module';
 import { AvisosModule } from './consumidores/avisos/avisos.module';
+import { AuditoriaModule } from './consumidores/auditoria/auditoria.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { AvisosModule } from './consumidores/avisos/avisos.module';
     RabbitModule,
     PersistenciaModule,
     AvisosModule,
+    AuditoriaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

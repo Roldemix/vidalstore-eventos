@@ -17,7 +17,7 @@ export class EventoAuditoria {
   usuarioSub!: string | null;
 
   @Column({ type: 'jsonb' })
-  payload!: unknown;
+  payload!: Record<string, any>;
 
   @Column({ name: 'emitido_en', type: 'timestamptz' })
   emitidoEn!: Date;

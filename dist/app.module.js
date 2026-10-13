@@ -14,6 +14,7 @@ const app_service_1 = require("./app.service");
 const rabbit_module_1 = require("./rabbit/rabbit.module");
 const persistencia_module_1 = require("./persistencia/persistencia.module");
 const avisos_module_1 = require("./consumidores/avisos/avisos.module");
+const auditoria_module_1 = require("./consumidores/auditoria/auditoria.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -24,6 +25,7 @@ exports.AppModule = AppModule = __decorate([
             rabbit_module_1.RabbitModule,
             persistencia_module_1.PersistenciaModule,
             avisos_module_1.AvisosModule,
+            auditoria_module_1.AuditoriaModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

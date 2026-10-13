@@ -36,6 +36,10 @@ function leerEvento(msg) {
     if (typeof eventoId !== 'string' || !UUID_RE.test(eventoId)) {
         throw new MensajeMalFormadoError('x-evento-id falta o no es un UUID');
     }
-    return { routingKey, eventoId, datos: obj };
+    const emitidoEn = new Date(String(msg.properties.headers?.['x-emitido-en']));
+    if (Number.isNaN(emitidoEn.getTime())) {
+        throw new MensajeMalFormadoError('x-emitido-en falta o no es una fecha ISO 8601');
+    }
+    return { routingKey, eventoId, emitidoEn, datos: obj };
 }
 //# sourceMappingURL=mensaje.js.map

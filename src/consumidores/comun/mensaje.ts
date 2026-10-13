@@ -15,6 +15,7 @@ const CAMPOS_OBLIGATORIOS: Record<string, readonly string[]> = {
 export interface EventoLeido {
   routingKey: string;
   eventoId: string;
+  emitidoEn: Date;
   datos: Record<string, unknown>;
 }
 
@@ -43,5 +44,10 @@ export function leerEvento(msg: ConsumeMessage): EventoLeido {
     throw new MensajeMalFormadoError('x-evento-id falta o no es un UUID');
   }
 
-  return { routingKey, eventoId, datos: obj };
+    const emitidoEn = new Date(String(msg.properties.headers?.['x-emitido-en']));
+  if (Number.isNaN(emitidoEn.getTime())) {
+    throw new MensajeMalFormadoError('x-emitido-en falta o no es una fecha ISO 8601');
+  }
+
+  return { routingKey, eventoId, emitidoEn, datos: obj };
 }
