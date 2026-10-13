@@ -12,12 +12,13 @@ const config_1 = require("@nestjs/config");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const rabbit_module_1 = require("./rabbit/rabbit.module");
+const avisos_module_1 = require("./consumidores/avisos/avisos.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule.forRoot({ isGlobal: true }), rabbit_module_1.RabbitModule],
+        imports: [config_1.ConfigModule.forRoot({ isGlobal: true }), rabbit_module_1.RabbitModule, avisos_module_1.AvisosModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })
