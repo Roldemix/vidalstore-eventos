@@ -11,11 +11,16 @@ export const ROUTING_KEYS = {
   correoEnviar: 'correo.enviar',
 } as const;
 
-export const COLAS = {
+export interface ParDeColas {
+  trabajo: string;
+  dlq: string;
+}
+
+export const COLAS: Record<'avisos' | 'auditoria' | 'correos', ParDeColas> = {
   avisos: { trabajo: 'vidalstore.avisos', dlq: 'vidalstore.avisos.dlq' },
   auditoria: { trabajo: 'vidalstore.auditoria', dlq: 'vidalstore.auditoria.dlq' },
   correos: { trabajo: 'vidalstore.correos', dlq: 'vidalstore.correos.dlq' },
-} as const;
+};
 
 // Bindings de las colas de trabajo (los de las DLQ se derivan de COLAS).
 export const BINDINGS = [

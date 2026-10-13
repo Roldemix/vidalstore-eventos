@@ -46,13 +46,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RabbitService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
-const declarar_topologia_1 = require("../mensajeria/declarar-topologia");
 const amqp = __importStar(require("amqplib"));
+const declarar_topologia_1 = require("../mensajeria/declarar-topologia");
 let RabbitService = RabbitService_1 = class RabbitService {
     config;
     logger = new common_1.Logger(RabbitService_1.name);
     connection;
     channel;
+    confirmChannel;
     constructor(config) {
         this.config = config;
     }
@@ -60,17 +61,22 @@ let RabbitService = RabbitService_1 = class RabbitService {
         const url = this.config.getOrThrow('RABBITMQ_URL');
         this.connection = await amqp.connect(url);
         this.channel = await this.connection.createChannel();
+        this.confirmChannel = await this.connection.createConfirmChannel();
         await (0, declarar_topologia_1.declararTopologia)(this.channel);
-        this.logger.log('Conectado a RabbitMQ');
+        this.logger.log('Conectado a RabbitMQ y topologia declarada');
     }
     getChannel() {
         return this.channel;
+    }
+    getConfirmChannel() {
+        return this.confirmChannel;
     }
     isConnected() {
         return !!this.channel;
     }
     async onModuleDestroy() {
         await this.channel?.close();
+        await this.confirmChannel?.close();
         await this.connection?.close();
     }
 };
