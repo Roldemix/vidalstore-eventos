@@ -1,5 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { declararTopologia } from '../mensajeria/declarar-topologia';
 import * as amqp from 'amqplib';
 
 @Injectable()
@@ -14,6 +15,7 @@ export class RabbitService implements OnModuleInit, OnModuleDestroy {
     const url = this.config.getOrThrow<string>('RABBITMQ_URL');
     this.connection = await amqp.connect(url);
     this.channel = await this.connection.createChannel();
+    await declararTopologia(this.channel);
     this.logger.log('Conectado a RabbitMQ');
   }
 

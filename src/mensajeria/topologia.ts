@@ -1,0 +1,26 @@
+export const EXCHANGES = {
+  eventos: { nombre: 'vidalstore.eventos', tipo: 'topic' },
+  comandos: { nombre: 'vidalstore.comandos', tipo: 'direct' },
+  dlx: { nombre: 'vidalstore.dlx', tipo: 'direct' },
+} as const;
+
+export const ROUTING_KEYS = {
+  compraRealizada: 'compra.realizada',
+  licenciaRevocada: 'licencia.revocada',
+  juegoPublicado: 'juego.publicado',
+  correoEnviar: 'correo.enviar',
+} as const;
+
+export const COLAS = {
+  avisos: { trabajo: 'vidalstore.avisos', dlq: 'vidalstore.avisos.dlq' },
+  auditoria: { trabajo: 'vidalstore.auditoria', dlq: 'vidalstore.auditoria.dlq' },
+  correos: { trabajo: 'vidalstore.correos', dlq: 'vidalstore.correos.dlq' },
+} as const;
+
+// Bindings de las colas de trabajo (los de las DLQ se derivan de COLAS).
+export const BINDINGS = [
+  { exchange: EXCHANGES.eventos.nombre, cola: COLAS.avisos.trabajo, routingKey: ROUTING_KEYS.licenciaRevocada },
+  { exchange: EXCHANGES.eventos.nombre, cola: COLAS.avisos.trabajo, routingKey: ROUTING_KEYS.compraRealizada },
+  { exchange: EXCHANGES.eventos.nombre, cola: COLAS.auditoria.trabajo, routingKey: '#' },
+  { exchange: EXCHANGES.comandos.nombre, cola: COLAS.correos.trabajo, routingKey: ROUTING_KEYS.correoEnviar },
+] as const;
