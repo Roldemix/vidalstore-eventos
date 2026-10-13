@@ -1,6 +1,7 @@
 import type { ConsumeMessage } from 'amqplib';
 export declare class MensajeMalFormadoError extends Error {
 }
+export declare const UUID_RE: RegExp;
 export interface EventoLeido {
     routingKey: string;
     eventoId: string;

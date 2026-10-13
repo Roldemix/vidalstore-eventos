@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MensajeMalFormadoError = void 0;
+exports.UUID_RE = exports.MensajeMalFormadoError = void 0;
 exports.leerEvento = leerEvento;
 const topologia_1 = require("../../mensajeria/topologia");
 class MensajeMalFormadoError extends Error {
 }
 exports.MensajeMalFormadoError = MensajeMalFormadoError;
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+exports.UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const CAMPOS_OBLIGATORIOS = {
     [topologia_1.ROUTING_KEYS.compraRealizada]: ['licenciaId', 'juegoId', 'usuarioSub', 'adquiridaEn'],
     [topologia_1.ROUTING_KEYS.licenciaRevocada]: ['licenciaId', 'juegoId', 'usuarioSub', 'revocadaPor', 'motivo'],
@@ -33,7 +33,7 @@ function leerEvento(msg) {
         }
     }
     const eventoId = msg.properties.headers?.['x-evento-id'];
-    if (typeof eventoId !== 'string' || !UUID_RE.test(eventoId)) {
+    if (typeof eventoId !== 'string' || !exports.UUID_RE.test(eventoId)) {
         throw new MensajeMalFormadoError('x-evento-id falta o no es un UUID');
     }
     const emitidoEn = new Date(String(msg.properties.headers?.['x-emitido-en']));

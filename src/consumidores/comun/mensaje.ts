@@ -3,7 +3,7 @@ import { ROUTING_KEYS } from '../../mensajeria/topologia';
 
 export class MensajeMalFormadoError extends Error {}
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const CAMPOS_OBLIGATORIOS: Record<string, readonly string[]> = {
   [ROUTING_KEYS.compraRealizada]: ['licenciaId', 'juegoId', 'usuarioSub', 'adquiridaEn'],
