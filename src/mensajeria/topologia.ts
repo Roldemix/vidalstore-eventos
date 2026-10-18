@@ -14,12 +14,13 @@ export const ROUTING_KEYS = {
 export interface ParDeColas {
   trabajo: string;
   dlq: string;
+  routingKeyDlq: string;
 }
 
 export const COLAS: Record<'avisos' | 'auditoria' | 'correos', ParDeColas> = {
-  avisos: { trabajo: 'vidalstore.avisos', dlq: 'vidalstore.avisos.dlq' },
-  auditoria: { trabajo: 'vidalstore.auditoria', dlq: 'vidalstore.auditoria.dlq' },
-  correos: { trabajo: 'vidalstore.correos', dlq: 'vidalstore.correos.dlq' },
+  avisos: { trabajo: 'vidalstore.avisos', dlq: 'vidalstore.avisos.dlq', routingKeyDlq: 'avisos.dlq' },
+  auditoria: { trabajo: 'vidalstore.auditoria', dlq: 'vidalstore.auditoria.dlq', routingKeyDlq: 'auditoria.dlq' },
+  correos: { trabajo: 'vidalstore.correos', dlq: 'vidalstore.correos.dlq', routingKeyDlq: 'correos.dlq' },
 };
 
 // Bindings de las colas de trabajo (los de las DLQ se derivan de COLAS).
