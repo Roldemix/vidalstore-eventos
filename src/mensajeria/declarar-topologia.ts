@@ -12,14 +12,14 @@ export async function declararTopologia(ch: Channel): Promise<void> {
     await ch.bindQueue(c.dlq, EXCHANGES.dlx.nombre, c.trabajo);
   }
 
-  // 2) Las colas de trabajo, apuntando al DLX con su propio nombre como routing key.
+  // 2) Las colas de trabajo apuntan al DLX usando la clave de su DLQ.
   for (const c of Object.values(COLAS)) {
     await ch.assertQueue(c.trabajo, {
       durable: true,
       arguments: {
         'x-queue-type': 'quorum',
         'x-dead-letter-exchange': EXCHANGES.dlx.nombre,
-        'x-dead-letter-routing-key': c.trabajo,
+        'x-dead-letter-routing-key': c.dlq.replace('vidalstore.', ''),
       },
     });
   }
