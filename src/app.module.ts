@@ -8,6 +8,7 @@ import { AvisosModule } from './consumidores/avisos/avisos.module';
 import { AuditoriaModule } from './consumidores/auditoria/auditoria.module';
 import { CorreosModule } from './consumidores/correos/correos.module';
 import { MensajesMuertosModule } from './consumidores/mensajes-muertos/mensajes-muertos.module';
+import { StreamingModule } from './streaming/streaming.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { MensajesMuertosModule } from './consumidores/mensajes-muertos/mensajes-
     AuditoriaModule,
     CorreosModule,
     MensajesMuertosModule,
+    StreamingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
