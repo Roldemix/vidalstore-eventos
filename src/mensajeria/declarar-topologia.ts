@@ -6,10 +6,10 @@ export async function declararTopologia(ch: Channel): Promise<void> {
     await ch.assertExchange(x.nombre, x.tipo, { durable: true });
   }
 
-  // 1) Las DLQ primero, atadas al DLX con el nombre de su cola de trabajo.
+  // 1) Las DLQ primero, atadas al DLX con su routing key estable.
   for (const c of Object.values(COLAS)) {
     await ch.assertQueue(c.dlq, { durable: true, arguments: { 'x-queue-type': 'quorum' } });
-    await ch.bindQueue(c.dlq, EXCHANGES.dlx.nombre, c.trabajo);
+    await ch.bindQueue(c.dlq, EXCHANGES.dlx.nombre, c.routingKeyDlq);
   }
 
   // 2) Las colas de trabajo apuntan al DLX usando la clave de su DLQ.
