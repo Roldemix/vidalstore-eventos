@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, Unique
 
 @Entity({ name: 'alertas', schema: 'eventos' })
 @Unique('uq_alerta_evento_id', ['eventoId'])
+@Unique('uq_alerta_juego_ventana', ['juegoId', 'ventanaInicio', 'ventanaFin'])
 @Index('idx_alertas_juego_ventana', ['juegoId', 'ventanaInicio'])
 export class Alerta {
   @PrimaryGeneratedColumn('uuid')

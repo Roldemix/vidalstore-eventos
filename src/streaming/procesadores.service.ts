@@ -39,15 +39,16 @@ export class ProcesadoresStreamingService {
   async alerta(evento: EventoStream): Promise<void> {
     await this.panel(evento);
     if (!evento.tipo.includes('termin')) return;
-    const ventanaFin = new Date(evento.emitidoEn);
-    ventanaFin.setUTCSeconds(0, 0);
-    const ventanaInicio = new Date(ventanaFin.getTime() - 5 * 60 * 1000);
+    const minuto = minutoDe(evento.emitidoEn);
+    const ventanaInicio = new Date(minuto);
+    ventanaInicio.setUTCMinutes(Math.floor(ventanaInicio.getUTCMinutes() / 5) * 5);
+    const ventanaFin = new Date(ventanaInicio.getTime() + 5 * 60 * 1000);
     const filas = await this.kpi
       .createQueryBuilder('k')
       .where('k.juego_id = :juegoId', { juegoId: evento.datos.juegoId })
       .andWhere('k.minuto >= :inicio AND k.minuto < :fin', {
         inicio: ventanaInicio,
-        fin: new Date(ventanaFin.getTime() + 60 * 1000),
+        fin: ventanaFin,
       })
       .getMany();
     const terminadas = filas.filter((fila) => fila.tipo.includes('termin')).length;
@@ -57,14 +58,24 @@ export class ProcesadoresStreamingService {
     if (terminadas < 3 || errores / terminadas <= 0.2) return;
 
     try {
-      await this.alertas.insert({
-        eventoId: evento.id,
-        juegoId: evento.datos.juegoId,
-        ventanaInicio,
-        ventanaFin: new Date(ventanaFin.getTime() + 60 * 1000),
-        enError: errores,
-        terminadas,
+      const alerta = await this.alertas.findOne({
+        where: { juegoId: evento.datos.juegoId, ventanaInicio, ventanaFin },
       });
+      if (alerta) {
+        await this.alertas.update(alerta.id, {
+          enError: errores,
+          terminadas,
+        });
+      } else {
+        await this.alertas.insert({
+          eventoId: evento.id,
+          juegoId: evento.datos.juegoId,
+          ventanaInicio,
+          ventanaFin,
+          enError: errores,
+          terminadas,
+        });
+      }
     } catch (error) {
       if (!esDuplicado(error)) throw error;
     }
