@@ -1,43 +1,39 @@
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import {
   Consumer,
   MessagesStreamFallbackModes,
   MessagesStreamModes,
   stringDeserializers,
 } from '@platformatic/kafka';
-import { plainToInstance } from 'class-transformer';
-import { validate } from 'class-validator';
 import type { Message } from '@platformatic/kafka';
-import { EventoKafkaDto } from './dto/evento-kafka.dto';
+import { ProcesadoresStreamingService } from './procesadores.service';
+import { leerEventoKafka } from './evento';
 import { TOPICS } from './topicos';
+
+type Flujo = Awaited<ReturnType<Consumer<string, string, string, string>['consume']>>;
 
 @Injectable()
 export class StreamingConsumer implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(StreamingConsumer.name);
   private readonly consumer: Consumer<string, string, string, string>;
-  private flujo?: Awaited<ReturnType<StreamingConsumer['crearFlujo']>>;
+  private flujo?: Flujo;
 
-  constructor() {
-    const bootstrapBrokers = (process.env.KAFKA_BROKERS ?? 'localhost:9092')
-      .split(',')
-      .map((broker) => broker.trim())
-      .filter(Boolean);
-
+  constructor(private readonly procesadores: ProcesadoresStreamingService) {
     this.consumer = new Consumer({
       groupId: 'vidalstore-panel',
       clientId: 'vidalstore-panel',
-      bootstrapBrokers,
+      bootstrapBrokers: this.brokers(),
       deserializers: stringDeserializers,
     });
   }
 
   async onModuleInit(): Promise<void> {
-    this.flujo = await this.crearFlujo();
+    this.flujo = await this.consumer.consume({
+      topics: [TOPICS.compras, TOPICS.actividad],
+      autocommit: false,
+      mode: MessagesStreamModes.COMMITTED,
+      fallbackMode: MessagesStreamFallbackModes.EARLIEST,
+    });
     void this.leer();
   }
 
@@ -46,57 +42,29 @@ export class StreamingConsumer implements OnModuleInit, OnModuleDestroy {
     await this.consumer.close();
   }
 
-  private crearFlujo() {
-    return this.consumer.consume({
-      topics: [TOPICS.compras, TOPICS.actividad],
-      autocommit: false,
-      mode: MessagesStreamModes.COMMITTED,
-      fallbackMode: MessagesStreamFallbackModes.EARLIEST,
-    });
-  }
-
   private async leer(): Promise<void> {
     if (!this.flujo) return;
-
-    try {
-      for await (const mensaje of this.flujo) {
-        try {
-          await this.registrar(mensaje);
-        } catch (err) {
-          const motivo = err instanceof Error ? err.message : String(err);
-          this.logger.warn(
-            `evento Kafka inválido (${mensaje.topic}, partición ${mensaje.partition}, offset ${mensaje.offset}): ${motivo}`,
-          );
-        } finally {
-          await mensaje.commit();
-        }
+    for await (const mensaje of this.flujo) {
+      try {
+        await this.procesadores.panel(await leerEventoKafka(mensaje));
+      } catch (error) {
+        this.logger.warn(this.error(mensaje, error));
+      } finally {
+        await mensaje.commit();
       }
-    } catch (err) {
-      const motivo = err instanceof Error ? err.message : String(err);
-      this.logger.error(`consumidor Kafka detenido: ${motivo}`);
     }
   }
 
-  private async registrar(mensaje: Message<string, string, string, string>): Promise<void> {
-    let datos: unknown;
-    try {
-      datos = JSON.parse(mensaje.value);
-    } catch {
-      throw new Error('el valor no es JSON');
-    }
+  private brokers(): string[] {
+    return (process.env.KAFKA_BROKERS ?? 'localhost:9092')
+      .split(',')
+      .map((broker) => broker.trim())
+      .filter(Boolean);
+  }
 
-    const dto = plainToInstance(EventoKafkaDto, datos);
-    const errores = await validate(dto);
-    if (errores.length > 0) {
-      throw new Error(
-        errores
-          .flatMap((error) => Object.values(error.constraints ?? {}))
-          .join('; '),
-      );
-    }
-
-    this.logger.log(
-      `evento ${mensaje.topic} registrado (partición ${mensaje.partition}, offset ${mensaje.offset}, usuario ${dto.usuarioSub})`,
-    );
+  private error(mensaje: Message<string, string, string, string>, error: unknown): string {
+    return `panel no pudo procesar ${mensaje.topic}/${mensaje.offset}: ${
+      error instanceof Error ? error.message : String(error)
+    }`;
   }
 }

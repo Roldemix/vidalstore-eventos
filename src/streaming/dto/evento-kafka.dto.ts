@@ -1,8 +1,8 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class EventoKafkaDto {
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   usuarioSub!: string;
 
   @IsString()
@@ -20,4 +20,24 @@ export class EventoKafkaDto {
   @IsOptional()
   @IsString()
   licenciaId?: string;
+
+  @IsOptional()
+  @IsNumber()
+  monto?: number;
+
+  @IsOptional()
+  @IsNumber()
+  precio?: number;
+
+  @IsOptional()
+  @IsNumber()
+  unidades?: number;
+
+  @IsOptional()
+  @IsString()
+  estado?: string;
+
+  @IsOptional()
+  @IsString()
+  titulo?: string;
 }
