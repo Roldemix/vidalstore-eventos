@@ -4,8 +4,22 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventoAuditoria } from './entidades/evento-auditoria.entity';
 import { MensajeMuerto } from './entidades/mensaje-muerto.entity';
 import { Notificacion } from './entidades/notificacion.entity';
+import { KpiMinuto } from './entidades/kpi-minuto.entity';
+import { Alerta } from './entidades/alerta.entity';
+import { VentaSemana } from './entidades/venta-semana.entity';
+import { EventoProcesado } from './entidades/evento-procesado.entity';
+import { CatalogoEstado } from './entidades/catalogo-estado.entity';
 
-const ENTIDADES = [EventoAuditoria, Notificacion, MensajeMuerto];
+const ENTIDADES = [
+  EventoAuditoria,
+  Notificacion,
+  MensajeMuerto,
+  KpiMinuto,
+  Alerta,
+  VentaSemana,
+  EventoProcesado,
+  CatalogoEstado,
+];
 
 @Module({
   imports: [
