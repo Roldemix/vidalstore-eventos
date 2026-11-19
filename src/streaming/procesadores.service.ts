@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
 import { Alerta } from '../persistencia/entidades/alerta.entity';
-import { EventoProcesado } from '../persistencia/entidades/evento-procesado.entity';
 import { KpiMinuto } from '../persistencia/entidades/kpi-minuto.entity';
 import { VentaSemana } from '../persistencia/entidades/venta-semana.entity';
 import { EventoStream, minutoDe, numero, semanaDe, texto } from './evento';
@@ -18,7 +17,6 @@ export class ProcesadoresStreamingService {
     @InjectRepository(KpiMinuto) private readonly kpi: Repository<KpiMinuto>,
     @InjectRepository(Alerta) private readonly alertas: Repository<Alerta>,
     @InjectRepository(VentaSemana) private readonly ventas: Repository<VentaSemana>,
-    @InjectRepository(EventoProcesado) private readonly procesados: Repository<EventoProcesado>,
   ) {}
 
   async panel(evento: EventoStream): Promise<void> {

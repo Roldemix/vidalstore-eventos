@@ -6,9 +6,9 @@ import {
   stringDeserializers,
 } from '@platformatic/kafka';
 import type { Message } from '@platformatic/kafka';
+import { ManejadorStreamingService } from './manejador-streaming.service';
 import { ProcesadoresStreamingService } from './procesadores.service';
-import { leerEventoKafka } from './evento';
-import { TOPICS } from './topicos';
+import { GRUPOS, TOPICS } from './topicos';
 
 type Flujo = Awaited<ReturnType<Consumer<string, string, string, string>['consume']>>;
 
@@ -18,10 +18,13 @@ export class StreamingConsumer implements OnModuleInit, OnModuleDestroy {
   private readonly consumer: Consumer<string, string, string, string>;
   private flujo?: Flujo;
 
-  constructor(private readonly procesadores: ProcesadoresStreamingService) {
+  constructor(
+    private readonly procesadores: ProcesadoresStreamingService,
+    private readonly manejador: ManejadorStreamingService,
+  ) {
     this.consumer = new Consumer({
-      groupId: 'vidalstore-panel',
-      clientId: 'vidalstore-panel',
+      groupId: GRUPOS.panel,
+      clientId: GRUPOS.panel,
       bootstrapBrokers: this.brokers(),
       deserializers: stringDeserializers,
     });
@@ -46,12 +49,26 @@ export class StreamingConsumer implements OnModuleInit, OnModuleDestroy {
     if (!this.flujo) return;
     for await (const mensaje of this.flujo) {
       try {
-        await this.procesadores.panel(await leerEventoKafka(mensaje));
+        await this.manejador.procesarMensaje(
+          mensaje,
+          (evento) => this.procesadores.panel(evento),
+          { grupo: GRUPOS.panel, logger: this.logger },
+        );
       } catch (error) {
-        this.logger.warn(this.error(mensaje, error));
+        // Si ni siquiera se pudo publicar en el .dlt, el offset no se confirma:
+        // Kafka lo volvera a entregar. El consumidor sigue vivo.
+        this.logger.error(this.error(mensaje, error));
       } finally {
-        await mensaje.commit();
+        await this.commit(mensaje);
       }
+    }
+  }
+
+  private async commit(mensaje: Message<string, string, string, string>): Promise<void> {
+    try {
+      await mensaje.commit();
+    } catch (error) {
+      this.logger.error(`panel no pudo confirmar ${mensaje.topic}/${mensaje.offset}: ${error}`);
     }
   }
 
